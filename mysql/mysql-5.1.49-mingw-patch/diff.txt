@@ -1,0 +1,59 @@
+Makefile
+include/mysql_version.h
+
+----------------------------------------------
+
+mysys/my_init.c
+
+#if defined(__MINGW32__)
+#include <stdint.h>
+#endif
+
+void my_parameter_handler(const wchar_t * expression, const wchar_t * function,
+                          const wchar_t * file, unsigned int line,
+                          uintptr_t pReserved)
+{
+  DBUG_PRINT("my",("Expression: %s  function: %s  file: %s, line: %d",
+		   expression, function, file, line));
+}
+
+
+
+-=---------------
+include/config-win.h
+
+static inline double ulonglong2double(ulonglong value)
+
+....
+
+static inline ulonglong double2ulonglong(double d)
+
+
+-----------------
+extra/yassl/taocrypt/include/runtime.hpp
+
+
+
+#if defined(__GNUC__) && !(defined(__ICC) || defined(__INTEL_COMPILER))
+
+->
+
+#if defined(__GNUC__) && !(defined(__ICC) || defined(__INTEL_COMPILER) || defined(__MINGW32__))
+
+
+--------------------
+
+mysys/my_open.c
+
+#include "mysys_priv.h"
+#include "mysys_err.h"
+#include <my_dir.h>
+#include <errno.h>
+#undef __WIN__
+#if defined(__WIN__)
+#include <share.h>
+#endif
+
+
+7.75 MB
+

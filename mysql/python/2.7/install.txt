@@ -1,0 +1,145 @@
+﻿   or: setup.py cmd --help
+
+
+D:\MySQL-python-1.2.3>c:\python27\python setup.py build_ext
+running build_ext
+building '_mysql' extension
+creating build
+creating build\temp.win32-2.7
+creating build\temp.win32-2.7\Release
+C:\Program Files\Microsoft Visual Studio 9.0\VC\BIN\cl.exe /c /nologo /Ox /MD /W
+3 /GS- /DNDEBUG -Dversion_info=(1,2,3,'final',0) -D__version__=1.2.3 "-IC:\Progr
+am Files\MySQL\MySQL Server 5.1\include" -Ic:\python27\include -Ic:\python27\PC
+/Tc_mysql.c /Fobuild\temp.win32-2.7\Release\_mysql.obj /Zl
+_mysql.c
+C:\Program Files\MySQL\MySQL Server 5.1\include\config-win.h(171) : warning C400
+5: “SIZEOF_OFF_T”: 宏重定义
+        c:\python27\include\pyconfig.h(355) : 参见“SIZEOF_OFF_T”的前一个定义
+C:\Program Files\MySQL\MySQL Server 5.1\include\config-win.h(269) : warning C400
+5: “HAVE_STDDEF_H”: 宏重定义
+        c:\python27\include\pyconfig.h(673) : 参见“HAVE_STDDEF_H”的前一个定义
+_mysql.c(1364) : warning C4018: “<”: 有符号/无符号不匹配
+creating build\lib.win32-2.7
+C:\Program Files\Microsoft Visual Studio 9.0\VC\BIN\link.exe /DLL /nologo /INCRE
+MENTAL:NO "/LIBPATH:C:\Program Files\MySQL\MySQL Server 5.1\lib\opt" /LIBPATH:c:
+\python27\libs /LIBPATH:c:\python27\PCbuild kernel32.lib advapi32.lib wsock32.li
+b mysqlclient.lib /EXPORT:init_mysql build\temp.win32-2.7\Release\_mysql.obj /OU
+T:build\lib.win32-2.7\_mysql.pyd /IMPLIB:build\temp.win32-2.7\Release\_mysql.lib
+ /MANIFESTFILE:build\temp.win32-2.7\Release\_mysql.pyd.manifest
+   正在创建库 build\temp.win32-2.7\Release\_mysql.lib 和对象 build\temp.win32-2.
+7\Release\_mysql.exp
+_mysql.obj : warning LNK4217: 本地定义的符号 _strncpy 在函数 __mysql_row_to_dict
+ 中导入
+_mysql.obj : warning LNK4217: 本地定义的符号 _strncat 在函数 __mysql_row_to_dict
+ 中导入
+_mysql.obj : warning LNK4217: 本地定义的符号 _sprintf 在函数 __mysql_ConnectionO
+bject_repr 中导入
+C:\Program Files\Microsoft SDKs\Windows\v6.0A\bin\mt.exe -nologo -manifest build
+\temp.win32-2.7\Release\_mysql.pyd.manifest -outputresource:build\lib.win32-2.7\
+_mysql.pyd;2
+
+build\temp.win32-2.7\Release\_mysql.pyd.manifest : general error c1010070: Faile
+0vload and parse the manifest. {_~
+error: command 'mt.exe' failed with exit status 31
+
+D:\MySQL-python-1.2.3>c:\python27\python setup.py build_ext
+running build_ext
+
+D:\MySQL-python-1.2.3>c:\python27\python setup.py bdist_wininst
+running bdist_wininst
+running build
+running build_py
+copying _mysql_exceptions.py -> build\lib.win32-2.7
+creating build\lib.win32-2.7\MySQLdb
+copying MySQLdb\__init__.py -> build\lib.win32-2.7\MySQLdb
+copying MySQLdb\converters.py -> build\lib.win32-2.7\MySQLdb
+copying MySQLdb\connections.py -> build\lib.win32-2.7\MySQLdb
+copying MySQLdb\cursors.py -> build\lib.win32-2.7\MySQLdb
+copying MySQLdb\release.py -> build\lib.win32-2.7\MySQLdb
+copying MySQLdb\times.py -> build\lib.win32-2.7\MySQLdb
+creating build\lib.win32-2.7\MySQLdb\constants
+copying MySQLdb\constants\__init__.py -> build\lib.win32-2.7\MySQLdb\constants
+copying MySQLdb\constants\CR.py -> build\lib.win32-2.7\MySQLdb\constants
+copying MySQLdb\constants\FIELD_TYPE.py -> build\lib.win32-2.7\MySQLdb\constants
+
+copying MySQLdb\constants\ER.py -> build\lib.win32-2.7\MySQLdb\constants
+copying MySQLdb\constants\FLAG.py -> build\lib.win32-2.7\MySQLdb\constants
+copying MySQLdb\constants\REFRESH.py -> build\lib.win32-2.7\MySQLdb\constants
+copying MySQLdb\constants\CLIENT.py -> build\lib.win32-2.7\MySQLdb\constants
+running build_ext
+installing to build\bdist.win32\wininst
+running install_lib
+creating build\bdist.win32
+creating build\bdist.win32\wininst
+creating build\bdist.win32\wininst\PLATLIB
+copying build\lib.win32-2.7\_mysql.pyd -> build\bdist.win32\wininst\PLATLIB
+copying build\lib.win32-2.7\_mysql_exceptions.py -> build\bdist.win32\wininst\PL
+ATLIB
+creating build\bdist.win32\wininst\PLATLIB\MySQLdb
+copying build\lib.win32-2.7\MySQLdb\__init__.py -> build\bdist.win32\wininst\PLA
+TLIB\MySQLdb
+copying build\lib.win32-2.7\MySQLdb\converters.py -> build\bdist.win32\wininst\P
+LATLIB\MySQLdb
+copying build\lib.win32-2.7\MySQLdb\connections.py -> build\bdist.win32\wininst\
+PLATLIB\MySQLdb
+copying build\lib.win32-2.7\MySQLdb\cursors.py -> build\bdist.win32\wininst\PLAT
+LIB\MySQLdb
+copying build\lib.win32-2.7\MySQLdb\release.py -> build\bdist.win32\wininst\PLAT
+LIB\MySQLdb
+copying build\lib.win32-2.7\MySQLdb\times.py -> build\bdist.win32\wininst\PLATLI
+B\MySQLdb
+creating build\bdist.win32\wininst\PLATLIB\MySQLdb\constants
+copying build\lib.win32-2.7\MySQLdb\constants\__init__.py -> build\bdist.win32\w
+ininst\PLATLIB\MySQLdb\constants
+copying build\lib.win32-2.7\MySQLdb\constants\CR.py -> build\bdist.win32\wininst
+\PLATLIB\MySQLdb\constants
+copying build\lib.win32-2.7\MySQLdb\constants\FIELD_TYPE.py -> build\bdist.win32
+\wininst\PLATLIB\MySQLdb\constants
+copying build\lib.win32-2.7\MySQLdb\constants\ER.py -> build\bdist.win32\wininst
+\PLATLIB\MySQLdb\constants
+copying build\lib.win32-2.7\MySQLdb\constants\FLAG.py -> build\bdist.win32\winin
+st\PLATLIB\MySQLdb\constants
+copying build\lib.win32-2.7\MySQLdb\constants\REFRESH.py -> build\bdist.win32\wi
+ninst\PLATLIB\MySQLdb\constants
+copying build\lib.win32-2.7\MySQLdb\constants\CLIENT.py -> build\bdist.win32\win
+inst\PLATLIB\MySQLdb\constants
+running install_egg_info
+running egg_info
+writing MySQL_python.egg-info\PKG-INFO
+writing top-level names to MySQL_python.egg-info\top_level.txt
+writing dependency_links to MySQL_python.egg-info\dependency_links.txt
+reading manifest file 'MySQL_python.egg-info\SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+warning: no files found matching 'MANIFEST'
+warning: no files found matching 'ChangeLog'
+warning: no files found matching 'GPL'
+writing manifest file 'MySQL_python.egg-info\SOURCES.txt'
+Copying MySQL_python.egg-info to build\bdist.win32\wininst\PLATLIB\MySQL_python-
+1.2.3-py2.7.egg-info
+running install_scripts
+creating 'c:\docume~1\admini~1\locals~1\temp\tmpg1eqxh.zip' and adding '.' to it
+
+adding 'PLATLIB\_mysql.pyd'
+adding 'PLATLIB\_mysql_exceptions.py'
+adding 'PLATLIB\MySQLdb\__init__.py'
+adding 'PLATLIB\MySQLdb\converters.py'
+adding 'PLATLIB\MySQLdb\connections.py'
+adding 'PLATLIB\MySQLdb\cursors.py'
+adding 'PLATLIB\MySQLdb\release.py'
+adding 'PLATLIB\MySQLdb\times.py'
+adding 'PLATLIB\MySQLdb\constants\__init__.py'
+adding 'PLATLIB\MySQLdb\constants\CR.py'
+adding 'PLATLIB\MySQLdb\constants\FIELD_TYPE.py'
+adding 'PLATLIB\MySQLdb\constants\ER.py'
+adding 'PLATLIB\MySQLdb\constants\FLAG.py'
+adding 'PLATLIB\MySQLdb\constants\REFRESH.py'
+adding 'PLATLIB\MySQLdb\constants\CLIENT.py'
+adding 'PLATLIB\MySQL_python-1.2.3-py2.7.egg-info\dependency_links.txt'
+adding 'PLATLIB\MySQL_python-1.2.3-py2.7.egg-info\SOURCES.txt'
+adding 'PLATLIB\MySQL_python-1.2.3-py2.7.egg-info\PKG-INFO'
+adding 'PLATLIB\MySQL_python-1.2.3-py2.7.egg-info\top_level.txt'
+creating dist
+removing 'build\bdist.win32\wininst' (and everything under it)
+
+D:\MySQL-python-1.2.3>
+

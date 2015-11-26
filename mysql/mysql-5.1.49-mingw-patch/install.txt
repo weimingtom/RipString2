@@ -1,0 +1,473 @@
+﻿
+在MinGW中编译libmysql（MySQL 5.1.49）简单测试上面的代码（静态库-g链接）
+（注：因为是简单测试，所以只考虑到代码中涉及的libmysql的API，
+其它API在编译时可能会有更为复杂的问题）
+
+一、下载MySQL源代码
+http://www.mysql.com/downloads/mysql/
+Select Platform:选择Source Code
+
+二、解压缩，然后写个Makefile（是我反复修改的，
+方法是把CMake后的VC2008工程libmysql.vcproj中.c文件名抽取出来，
+整理后所得），如下：
+
+PLAT= none
+CC= gcc
+CPP= g++
+
+#release : -O0 -g3 -Wall -fmessage-length=0
+#debug : -O2 -g -Wall -fmessage-length=0
+
+# Note1: uncomment this line "MYCFLAGS= -O2 -g" if you want to debug.
+#        In CDT, right click project explorer and "Clean Project" to rebuild this project.
+# 如果要换成debug模式，可以解除下句的注释 ,还有下文的Note2
+MYCFLAGS= -O0 -g3
+
+CFLAGS= $(MYCFLAGS) -Wall -fmessage-length=0 \
+ -DWIN32 -D_WINDOWS -D_DEBUG -DFORCE_INIT_OF_VARS \
+ -DENABLED_DEBUG_SYNC -DSAFEMALLOC -DSAFE_MUTEX -DUSE_TLS \
+ -D_CRT_SECURE_NO_DEPRECATE -DWITH_CSV_STORAGE_ENGINE \
+ -DWITH_HEAP_STORAGE_ENGINE -DWITH_MYISAM_STORAGE_ENGINE \
+ -DWITH_MYISAMMRG_STORAGE_ENGINE -DWITH_PARTITION_STORAGE_ENGINE \
+ -D_LIB -DYASSL_PREFIX -DYASSL_THREAD_SAFE -DHAVE_YASSL \
+ -DCMAKE_CONFIGD -DDEFAULT_MYSQL_HOME="\"c:/Program Files/MySQL/MySQL Server 5.1/\"" \
+ -DDEFAULT_BASEDIR="\"c:/Program Files/MySQL/\"" \
+ -DMYSQL_DATADIR="\"c:/Program Files/MySQL/MySQL Server 5.1/data\"" \
+ -DDEFAULT_CHARSET_HOME="\"c:/Program Files/MySQL/MySQL Server 5.1/\"" \
+ -DPACKAGE=mysql -DSHAREDIR="\"share\"" -D__NT__ \
+ -D_WIN32_WINNT=0x0501 -DCMAKE_INTDIR=\"Debug\" \
+ -Dlibmysql_EXPORTS -D_WINDLL -D_MBCS \
+ -DNO_OLDNAMES -DHAVE_RINT \
+ -I./include -I./libmysql -I./regex -I./sql \
+ -I./strings -I./zlib -I./dbug \
+ -I./extra/yassl/taocrypt/mySTL \
+ -I./extra/yassl/taocrypt/include \
+ -I./extra/yassl/include 
+
+CPPFLAGS = $(CFLAGS)
+
+LIBS=
+TESTCFLAGS= $(MYCFLAGS) -Wall -fmessage-length=0 \
+ -I./include
+TESTLIBS = ./lib/libmysql.dll.a
+
+AR= ar rcu
+RANLIB= ranlib
+RM= rm -f
+
+OBJECTS= zlib/adler32.o \
+zlib/compress.o \
+zlib/crc32.o \
+zlib/deflate.o \
+zlib/gzio.o \
+zlib/infback.o \
+zlib/inffast.o \
+zlib/inflate.o \
+zlib/inftrees.o \
+zlib/trees.o \
+zlib/uncompr.o \
+zlib/zutil.o \
+sql-common/client.o \
+sql-common/my_time.o \
+sql-common/pack.o \
+sql/net_serv.o \
+sql/password.o \
+strings/bchange.o \
+strings/bmove.o \
+strings/bmove_upp.o \
+strings/ctype-big5.o \
+strings/ctype-bin.o \
+strings/ctype-cp932.o \
+strings/ctype-czech.o \
+strings/ctype-euc_kr.o \
+strings/ctype-eucjpms.o \
+strings/ctype-extra.o \
+strings/ctype-gb2312.o \
+strings/ctype-gbk.o \
+strings/ctype-latin1.o \
+strings/ctype-mb.o \
+strings/ctype-simple.o \
+strings/ctype-sjis.o \
+strings/ctype-tis620.o \
+strings/ctype-uca.o \
+strings/ctype-ucs2.o \
+strings/ctype-ujis.o \
+strings/ctype-utf8.o \
+strings/ctype-win1250ch.o \
+strings/ctype.o \
+strings/int2str.o \
+strings/is_prefix.o \
+strings/my_strtoll10.o \
+strings/llstr.o \
+strings/longlong2str.o \
+strings/my_vsnprintf.o \
+strings/str2int.o \
+strings/str_alloc.o \
+strings/strcend.o \
+strings/strcont.o \
+strings/strend.o \
+strings/strfill.o \
+strings/strinstr.o \
+strings/strmake.o \
+strings/strmov.o \
+strings/strnlen.o \
+strings/strnmov.o \
+strings/strtod.o \
+strings/strtoll.o \
+strings/strtoull.o \
+strings/strxmov.o \
+strings/strxnmov.o \
+strings/xml.o \
+vio/vio.o \
+vio/viosocket.o \
+vio/viossl.o \
+vio/viosslfactories.o \
+dbug/dbug.o \
+dbug/factorial.o \
+dbug/sanity.o \
+mysys/array.o \
+mysys/charset-def.o \
+mysys/charset.o \
+mysys/default.o \
+mysys/errors.o \
+mysys/hash.o \
+mysys/my_sleep.o \
+mysys/default_modify.o \
+mysys/list.o \
+mysys/mf_arr_appstr.o \
+mysys/mf_cache.o \
+mysys/mf_dirname.o \
+mysys/mf_fn_ext.o \
+mysys/mf_format.o \
+mysys/mf_iocache.o \
+mysys/mf_iocache2.o \
+mysys/mf_loadpath.o \
+mysys/mf_pack.o \
+mysys/mf_path.o \
+mysys/mf_tempfile.o \
+mysys/mf_unixpath.o \
+mysys/mf_wcomp.o \
+mysys/mulalloc.o \
+mysys/my_access.o \
+mysys/my_alloc.o \
+mysys/my_chsize.o \
+mysys/my_compress.o \
+mysys/my_create.o \
+mysys/my_delete.o \
+mysys/my_div.o \
+mysys/my_error.o \
+mysys/my_file.o \
+mysys/my_fopen.o \
+mysys/my_fstream.o \
+mysys/my_gethostbyname.o \
+mysys/my_getopt.o \
+mysys/my_getwd.o \
+mysys/my_init.o \
+mysys/my_lib.o \
+mysys/my_malloc.o \
+mysys/my_messnc.o \
+mysys/my_net.o \
+mysys/my_once.o \
+mysys/my_open.o \
+mysys/my_pread.o \
+mysys/my_pthread.o \
+mysys/my_read.o \
+mysys/my_realloc.o \
+mysys/my_rename.o \
+mysys/my_seek.o \
+mysys/my_static.o \
+mysys/my_symlink.o \
+mysys/my_symlink2.o \
+mysys/my_thr_init.o \
+mysys/my_wincond.o \
+mysys/my_winthread.o \
+mysys/my_write.o \
+mysys/safemalloc.o \
+mysys/sha1.o \
+mysys/string.o \
+mysys/thr_mutex.o \
+mysys/typelib.o \
+mysys/mf_qsort.o \
+mysys/my_getsystime.o \
+mysys/my_sync.o \
+libmysql/errmsg.o \
+libmysql/get_password.o \
+libmysql/dll.o \
+libmysql/libmysql.o \
+libmysql/manager.o \
+extra/yassl/taocrypt/src/aes.o \
+extra/yassl/taocrypt/src/aestables.o \
+extra/yassl/taocrypt/src/algebra.o \
+extra/yassl/taocrypt/src/arc4.o \
+extra/yassl/taocrypt/src/asn.o \
+extra/yassl/taocrypt/src/coding.o \
+extra/yassl/taocrypt/src/des.o \
+extra/yassl/taocrypt/src/dh.o \
+extra/yassl/taocrypt/src/dsa.o \
+extra/yassl/taocrypt/src/file.o \
+extra/yassl/taocrypt/src/hash.o \
+extra/yassl/taocrypt/src/integer.o \
+extra/yassl/taocrypt/src/md2.o \
+extra/yassl/taocrypt/src/md4.o \
+extra/yassl/taocrypt/src/md5.o \
+extra/yassl/taocrypt/src/misc.o \
+extra/yassl/taocrypt/src/random.o \
+extra/yassl/taocrypt/src/ripemd.o \
+extra/yassl/taocrypt/src/rsa.o \
+extra/yassl/taocrypt/src/sha.o \
+extra/yassl/src/buffer.o \
+extra/yassl/src/cert_wrapper.o \
+extra/yassl/src/crypto_wrapper.o \
+extra/yassl/src/handshake.o \
+extra/yassl/src/handshake.o \
+extra/yassl/src/lock.o \
+extra/yassl/src/log.o \
+extra/yassl/src/socket_wrapper.o \
+extra/yassl/src/ssl.o \
+extra/yassl/src/timer.o \
+extra/yassl/src/yassl_error.o \
+extra/yassl/src/yassl_imp.o \
+extra/yassl/src/yassl_int.o \
+
+
+
+
+# Note2: if you want to comment this line "MYCFLAGS= -O2 -g", 
+#        please use "cleanbin" & "clean" and rebuild the project("Clean Project")
+# 切换debug和release版时(即修改MYCFLAGS)，最好用下面的make all重新编译一次
+#all : cleanbin bin/zlib.dll lib/libz.a bin/example.exe clean
+
+all : libmysql.a test.exe
+
+libmysql.dll : $(OBJECTS)
+	$(CC) -shared -o $@ $(OBJECTS) $(LIBS)
+	cp -p bin/zlib.dll lib/libmysql.dll.a
+	
+libmysql.a : $(OBJECTS)
+	$(AR) $@ $(OBJECTS)
+	#strip --strip-unneeded $@
+
+#-l次序需要注意
+test.exe : 
+	gcc $(CFLAGS) -o $@ main.c -L. -lmysql -lws2_32 -lstdc++
+
+clean : 
+	rm -f $(OBJECTS)
+	rm -f *.a *.dll *.exe
+	
+cleanbin :
+	rm -f bin/libmysql.dll lib/libmysql.a lib/libmysql.dll.a
+	
+run : all
+	bin/example.exe
+
+
+三、创建新文件include/mysql_version.h，如下：
+
+
+/* Copyright Abandoned 1996, 1999, 2001 MySQL AB
+   This file is public domain and comes with NO WARRANTY of any kind */
+
+/* Version numbers for protocol & mysqld */
+
+#ifndef _mysql_version_h
+#define _mysql_version_h
+#ifdef _CUSTOMCONFIG_
+#include <custom_conf.h>
+#else
+#define PROTOCOL_VERSION		10
+#define MYSQL_SERVER_VERSION		"5.1.49"
+#define MYSQL_BASE_VERSION		"mysqld-5.1"
+#define MYSQL_SERVER_SUFFIX_DEF		""
+#define FRM_VER				6
+#define MYSQL_VERSION_ID		50149
+#define MYSQL_PORT			3306
+#define MYSQL_PORT_DEFAULT		0
+#define MYSQL_UNIX_ADDR			"/tmp/mysql.sock"
+#define MYSQL_CONFIG_NAME		"my"
+#define MYSQL_COMPILATION_COMMENT	"Source distribution"
+
+/* mysqld compile time options */
+#endif /* _CUSTOMCONFIG_ */
+
+#ifndef LICENSE
+#define LICENSE				GPL
+#endif /* LICENSE */
+
+#endif /* _mysql_version_h */
+
+
+
+
+四、创建将要测试的客户端c源文件main.c（和上面一样），如下
+
+/*
+ * main.c
+ *
+ *  Created on: 2010-8-2
+ *      Author: Administrator
+ */
+#ifndef MAIN_H_
+#define MAIN_H_
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <windows.h>
+
+//#include <my_global.h>
+#include <mysql.h>
+
+static char *opt_host_name = "localhost";
+static char *opt_user_name = "root";
+static char *opt_password = "123456";
+static unsigned int opt_port_num = 3306;
+static char *opt_socket_name = NULL;
+static char *opt_db_name = "test";
+static unsigned int opt_flags = 0;
+
+static MYSQL *conn;
+
+void print_error(MYSQL *conn, const char *title){
+    fprintf(stderr,"%s:\nError %u (%s)\n",title,mysql_errno(conn),mysql_error(conn));
+}
+
+void process_result_set(MYSQL *conn,MYSQL_RES *res_set){
+    far MYSQL_ROW row;
+    unsigned int i;
+
+    while ((row = mysql_fetch_row(res_set)) != NULL){
+        for(i=0;i<mysql_num_fields(res_set);i++){
+            if (i > 0)
+                fputc('\t',stdout);
+            row[i] = row[i];
+            printf("%1s",row[i] != NULL ? row[i] : "NULL");
+        }
+        fputc('\n',stdout);
+    }
+
+    if(mysql_errno(conn) != 0)
+        print_error(conn,"mysql_fetch_row() failed");
+    else
+        printf("%lu rows returned \n",
+            (unsigned long)mysql_num_rows(res_set));
+}
+
+int main(int argc, _TCHAR* argv[])
+{
+    if( (conn = mysql_init(NULL))== NULL){
+        fprintf(stderr,"mysql 初始化失败(可能是内存溢出)!\n");
+        exit(1);
+    }
+
+    if(mysql_real_connect(conn,opt_host_name,opt_user_name,opt_password,
+        opt_db_name,opt_port_num,opt_socket_name,opt_flags) == NULL){
+
+            fprintf(stderr,"mysql_real_connect 失败:\nError %u (%s)\n",
+                mysql_errno(conn),mysql_error(conn));
+
+            mysql_close(conn);
+            exit(1);
+    }
+
+    if(mysql_query(conn,"insert into t (num, date) values (0, now());")){
+        print_error(conn,"执行插入失败");
+    }else{
+        printf("插入成功,受影响行数:%lu\n",(unsigned long)mysql_affected_rows(conn));
+    }
+
+    if(mysql_query(conn,"select * from t")){
+        print_error(conn,"mysql_query() error");
+    }else{
+        MYSQL_RES *res_set;
+        res_set = mysql_store_result(conn);    /**//*生成结果集*/
+        if(res_set == NULL)
+            print_error(conn,"mysql_store_result failed");
+        else {
+            process_result_set(conn,res_set);
+            mysql_free_result(res_set);
+        }
+    }
+
+    /**//*断开*/
+    mysql_close(conn);
+
+    getchar();
+    return 0;
+}
+#endif
+
+
+
+五、修改mysys/my_init.c，加上MINGW32的判断和#include <stdint.h>，
+否则，uintptr_t无定义错误（怀疑是因为这个类型在mingw的定义的头文件和VC2008的不一样）。
+
+#if defined(__MINGW32__)
+#include <stdint.h>
+#endif
+
+void my_parameter_handler(const wchar_t * expression, const wchar_t * function,
+                          const wchar_t * file, unsigned int line,
+                          uintptr_t pReserved)
+{
+  DBUG_PRINT("my",("Expression: %s  function: %s  file: %s, line: %d",
+		   expression, function, file, line));
+}
+
+
+六、修改include/config-win.h，在inline前加上static，
+使每个.o的inline函数符号不重复，避免符号冲突。
+否则在链接时候出现大量multiple definition错误。
+
+static inline double ulonglong2double(ulonglong value)
+static inline ulonglong double2ulonglong(double d)
+
+
+七、修改extra/yassl/taocrypt/include/runtime.hpp，加上MINGW32判断，
+否则出现multiple definition of `__cxa_pure_virtual'
+
+#if defined(__GNUC__) && !(defined(__ICC) || defined(__INTEL_COMPILER) || defined(__MINGW32__))
+
+
+八、修改mysys/my_open.c，加上#undef __WIN__，屏蔽sopen的windows移植。
+否则会出现undefined reference to `_dosmaperr'。
+
+#include "mysys_priv.h"
+#include "mysys_err.h"
+#include <my_dir.h>
+#include <errno.h>
+#undef __WIN__
+#if defined(__WIN__)
+#include <share.h>
+#endif
+
+
+九、Makefile的问题
+a)
+Makefile编译参数加上-DNO_OLDNAMES -DHAVE_RINT否则会有一堆函数重复定义
+
+b)
+加入yaSSL时，出现大量类似信息：
+undefined reference to `operator delete(void*)'
+需要在编译参数中加入-lstdc++
+
+c)
+出现类似信息
+undefined reference to `socket@12'
+需要在编译参数中加入-lws2_32
+
+d)
+注意顺序要在-lmysql后
+test.exe : 
+	gcc $(CFLAGS) -o $@ main.c -L. -lmysql -lws2_32 -lstdc++
+
+否则会导致-l失效
+
+
+
+十、执行make clean && make最后生成exe为7.75 MB（-g编译），运行正常（没有出现崩溃情况）
+
+
+
+
+

@@ -1,0 +1,99 @@
+﻿一、写一个简单的使用MySQLdb的python脚本
+首先写个最简单的MySQLdb使用例子：（假设test库存在，且root密码为空）
+#!python
+
+#see http://mysql-python.sourceforge.net/MySQLdb.html
+
+import MySQLdb
+
+db = MySQLdb.connect(host='localhost', port=3306, 
+	user='root', passwd='', db="test")
+cur = db.cursor()
+
+cur.execute('CREATE TABLE exmpl_tbl (id INT, val VARCHAR(100))')
+cur.execute("""INSERT INTO exmpl_tbl VALUES(1, 'Hello')""")
+cur.execute('DROP TABLE exmpl_tbl')
+
+cur.close()
+db.close()
+
+注意用户名和密码，然后保存为PyMySQL.py。
+测试时运行
+> C:\Python27\python.exe PyMySQL.py
+即可。
+MySQLdb的详细用法参考：
+http://mysql-python.sourceforge.net/MySQLdb.html
+
+
+二、使用pyKanjiDict（Python2.3 + MySQL4.1）测试MySQLdb库
+如果只是为了好奇，可以找这个开源项目的绿色版Python测试：
+下载地址：
+http://sourceforge.net/projects/pykanjidict/
+注意事项：
+1. python23.dll在pyKanjiDict-1.0-win32\webdict\Python23\DLLs，最好复制一份到pyKanjiDict-1.0-win32\webdict\Python23或者加入环境变量PATH，否则会弹出对话框警告。
+2. 由于默认已经装有MySQLdb库，所以你只要写个脚本，然后启动MySQL4.1进行测试即可。切换到mysql\bin目录，通过控制台启动MySQL4.1:
+> mysqld
+然后用新的控制台执行
+> python PyMySQL.py
+最后记得在任务管理器中手工关闭mysqld进程（因为那个MySQL4.1无法通过Ctrl+C结束运行）
+3. 兼容其他版本的MySQL服务器端
+嗯，我测试过xp下貌似5.0和5.1都没问题，所以如果没太高要求，用pyKanjiDict自带的python来学习MySQLdb库还是OK的。
+
+
+三、用setuptools和VC2008编译安装Python2.7的MySQL-Python
+保证已经安装了VC2008。
+安装2.7版的Python
+安装2.7版的setuptools
+http://pypi.python.org/pypi/setuptools
+然后下载MySQL-Python（即MySQLdb库）的源码包
+http://sourceforge.net/projects/mysql-python/files/mysql-python/1.2.3/
+解压后根据以下提示修改
+http://arthraim.cn/building-mysqldb-for-python-on-windows/
+下载MySQL5.1，用完全安装（不需要运行服务）。
+然后根据
+http://servut.us/akx/2010/09/mysqldb-windows-binaries-python-26-27/
+执行：（假设python已经指向C:\Python27\python.exe）
+python setup.py build_ext
+python setup.py bdist_wininst 
+如果有出错可以参考
+http://arthraim.cn/building-mysqldb-for-python-on-windows/
+的方法修改。
+然后目录下会生成dist\MySQL-python-1.2.3.win32-py2.7.exe
+双击安装。
+或者直接把build\lib.win32-2.7下的所有文件复制到
+C:\Python27\Lib\site-packages下
+
+
+四、用VC2008编译Python2.7的MySQL-Python的_mysql.pyd
+新建一个VC2008 win32 dll工程。加入_mysql.c和pymemcompat.h
+激活Release解决方案配置，
+然后根据需要修改工程属性（注意路径，这里全部设置为完整路径，所以要看实际情况）：
+C/C++：
+附加包含目录（/I[path]）
+"C:\Python27\include";"C:\Program Files\MySQL\MySQL Server 5.1\include"
+预处理定义（/D[macro]）
+NDEBUG;"version_info=(1,2,3,'final',0)";"__version__=1.2.3"
+运行时库（/MT, /MTd, /MD, /MDd）
+/MT
+链接器：
+输出文件（/OUT:[file]）
+C:\Python27\Lib\site-packages\_mysql.pyd
+附加库目录（/LIBPATH:[dir]）
+"C:\Python27\libs";"C:\Program Files\MySQL\MySQL Server 5.1\lib\opt"
+附加依赖项：
+kernel32.lib advapi32.lib wsock32.lib mysqlclient.lib
+编译Release（不要编译Debug）后检查C:\Python27\Lib\site-packages\是否输出了_mysql.pyd
+然后把_mysql_exceptions.py和整个MySQLdb目录拷贝到C:\Python27\Lib\site-packages下。
+
+
+四、用VC2008编译Python3.1的MySQL-Python的_mysql.pyd
+代码包在http://sourceforge.net/projects/mysql-python/forums/forum/70460/topic/3831691
+方法同上（只不过把凡是Python的路径都要改为C:\Python31）
+
+
+
+
+
+
+
+

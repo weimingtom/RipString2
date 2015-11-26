@@ -1,0 +1,110 @@
+﻿
+
+更正link错误（每次更改需要重新clean）：
+
+----------------------------------
+
+Makefile编译参数加上-DNO_OLDNAMES -DHAVE_RINT否则会有一堆函数重复定义
+ 
+----------------------------------
+mysys/my_init.c
+
+void my_parameter_handler(const wchar_t * expression, const wchar_t * function,
+                          const wchar_t * file, unsigned int line,
+                          uintptr_t pReserved)
+{
+  DBUG_PRINT("my",("Expression: %s  function: %s  file: %s, line: %d",
+		   expression, function, file, line));
+}
+
+uintptr_t没有定义
+加上
+#if defined(__MINGW32__)
+#include <stdint.h>
+#endif
+
+
+----------------------------------
+
+inline double ulonglong2double(ulonglong value)
+{
+  longlong nr=(longlong) value;
+  if (nr >= 0)
+    return (double) nr;
+  return (18446744073709551616.0 + (double) nr);
+}
+#define my_off_t2double(A) ulonglong2double(A)
+#endif /* _WIN64 */
+
+inline ulonglong double2ulonglong(double d)
+{
+  double t= d - (double) 0x8000000000000000ULL;
+
+  if (t >= 0)
+    return  ((ulonglong) t) + 0x8000000000000000ULL;
+  return (ulonglong) d;
+}
+
+
+
+在链接时候出现大量错误multiple definition错误
+
+解决方法：在inline前面加上static，使每个.o的inline函数符号不重复，避免符号冲突
+
+
+
+
+
+------------------------------------
+a)
+加入yaSSL时，出现大量类似
+undefined reference to `operator delete(void*)'
+需要在编译参数中加入-lstdc++
+
+b)
+出现类似
+undefined reference to `socket@12'
+估计是缺乏sdk的lib
+查资料，看mingw中哪些库可以提供此API，则加入-lws2_32
+
+c)
+注意顺序要在-lmysql后
+test.exe : 
+	gcc $(CFLAGS) -o $@ main.c -L. -lmysql -lws2_32 -lstdc++
+
+否则会导致-l失效
+
+d)
+multiple definition of `__cxa_pure_virtual'
+搜索代码发现，实际上是在extra/yassl/taocrypt/include/runtime.hpp中的错误
+参考
+http://database.itags.org/mysql/13002/
+寻找上面
+#if defined(__GNUC__) && !(defined(__ICC) || defined(__INTEL_COMPILER))
+改为
+#if defined(__GNUC__) && !(defined(__ICC) || defined(__INTEL_COMPILER) || defined(__MINGW32__))
+
+e)
+undefined reference to `_dosmaperr'
+根据
+http://code.google.com/p/libarchive/issues/detail?id=23
+说
+_dosmaperr() is not available for mingw -
+it was added with the msvc runtime version 7.1 (afaik) but mingw is
+still using msvc runtime 6.0 ...
+所以只能去掉_dosmaperr()的使用
+在mysys/my_open.c中开头
+#if defined(__WIN__)
+#include <share.h>
+#endif
+前加上
+#undef __WIN__
+
+
+
+
+
+
+
+
+
