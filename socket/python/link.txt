@@ -1,0 +1,8 @@
+the-mcp-riot
+Example MMO framework built in Python
+http://code.google.com/p/the-mcp-riot/
+
+
+Foundations of Python Network Programming
+http://www.apress.com/9781590593714
+
